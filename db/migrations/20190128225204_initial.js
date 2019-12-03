@@ -5,7 +5,7 @@ exports.up = function(knex) {
       table.increments('id').primary();
       table.string('title');
       table.string('artistName');
-      table.string('genre');
+      table.string('genre').notNullable().defaultTo('Unknown');
       table.integer('rating');
       table.timestamps(true, true);
     })
