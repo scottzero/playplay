@@ -10,20 +10,45 @@ const database = require('knex')(configuration);
 const getKey = (apikey) => {
   return yaml.safeLoad(fs.readFileSync("./config.yml", "utf8"))[apikey];
 }
+const songPojo = require('../../../models/song')
 async function getSong(track, artist){
   const key = await getKey('apikey');
-  // try {
-    let response = await fetch(`https://api.musixmatch.com/ws/1.1/track.search?q_track=${track}&q_artist=${artist}&quorum_factor=0.9&apikey=${key}`)
+    let response = await fetch(`https://api.musixmatch.com/ws/1.1/matcher.track.get?q_track=${track}&q_artist=${artist}&apikey=${key}`)
     let song = await response.json();
-    let re_artist = await new RegExp(`^${artist}$`)
-    // let re_track = await new RegExp(`^${track}$`)
-    // let regEx = await /^art$/;
-    let data = await song.message.body.track_list.find(obj => ( re_artist.test(obj.track.artist_name) && obj.track.track_name.includes(track)));
-    console.log(data);
-  // } catch(err){
-    // return err;
-  // }
+    let data = await song.message.body
+    return data;
 }
 
 
-getSong("Creep", "Radiohead")
+async function desiredData(track, artist){
+  var songData = await getSong(track, artist);
+  var filteredSongData = await new songPojo(songData);
+  return filteredSongData // returns Song {
+                                      // title: 'Creep - String Quartet Tribute to Radiohead',
+                                      // artistName: 'Vitamin String Quartet',
+                                      // rating: 28 }
+}
+
+desiredData("Creep", "Radiohead")
+
+router.post('/', (request, response)=>{
+  async function banana(request, response){
+  database('favorites').then(faves => {
+    console.log(request.body)
+    var useMeData = await desiredData(request.title, request.artistName);
+    var id = request.id;
+    var title = useMeData.title;
+    var artistName = useMeData.artistName;
+    var rating = useMeData.rating;
+    database('favorites').insert({title: title, artistName: artistName, rating: rating}, "id")
+    .then(res => response.status(201).send('song has been added to your favorites'))
+    .catch(error => response.status(500).send(error));
+    };
+    banana(request,response);
+  });
+});
+
+
+
+module.exports = router;
+// desiredData("Creep", "Radiohead")
