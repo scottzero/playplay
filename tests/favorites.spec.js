@@ -46,45 +46,56 @@ describe('Test GET /api/v1/favorites path', () => {
     });
   });
 
-    describe('Test GET /api/v1/favorites path', () => {
-      beforeEach(async () => {
-           await database.raw('truncate table favorites cascade');
-           let song = {
-             id: 1,
-             title: 'creep',
-             artistName: 'radiohead',
-             genre: 'alternative',
-             rating: 90,
-           };
-           await database('favorites').insert(song, 'id');
+  describe('Test GET /api/v1/favorites path', () => {
+    beforeEach(async () => {
+         await database.raw('truncate table favorites cascade');
+         let song = {
+           id: 1,
+           title: 'creep',
+           artistName: 'radiohead',
+           genre: 'alternative',
+           rating: 90,
+         };
+         await database('favorites').insert(song, 'id');
+      });
+
+      afterEach(() => {
+        database.raw('truncate table favorites cascade');
+      });
+
+      it('happy path, get a single object...', async () => {
+        const res = await request(app).get("/api/v1/favorites/1");
+        expect(res.statusCode).toBe(200);
+        const expected = {
+          title: 'creep',
+          artistName: 'radiohead',
+          genre: 'alternative',
+          rating: 90
+        };
+        expect(res.body[0]).toEqual(expected);
+      });
+    });
+
+    describe('Test DELETE /api/v1/favorites/:id path', () => {
+        it('sad path, no records in the database...', async () => {
+          await database.raw('truncate table favorites cascade');
+          const res = await request(app).delete("/api/v1/favorites/1");
+          expect(res.statusCode).toBe(404);
+          expect(res.body.message).toBe("That song could not be deleted, because it does not exist.");
         });
 
-        afterEach(() => {
-          database.raw('truncate table favorites cascade');
-        });
-
-        it('happy path, get a single object...', async () => {
-          const res = await request(app).get("/api/v1/favorites/1");
-          console.log(res.body)
-          expect(res.statusCode).toBe(200);
-          const expected = {
+        it('happy path, delete a single object...', async () => {
+          let song = {
+            id: 1,
             title: 'creep',
             artistName: 'radiohead',
             genre: 'alternative',
-            rating: 90
+            rating: 90,
           };
-          expect(res.body[0]).toEqual(expected);
+          await database('favorites').insert(song, 'id');
+
+          const res = await request(app).delete("/api/v1/favorites/1");
+          expect(res.statusCode).toBe(204);
+          expect(res.body).toEqual({});
         });
       });
-  //   it('happy path, get a single object...', async () => {
-  //     const res = await request(app).get("/api/v1/favorites/1");
-  //     expect(res.statusCode).toBe(200);
-  //     const expected = {
-  //       title: 'creep',
-  //       artistName: 'radiohead',
-  //       genre: 'alternative',
-  //       rating: 90
-  //     };
-  //     expect(res.body[0]).toEqual(expected);
-  //   });
-  // });
