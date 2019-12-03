@@ -41,4 +41,18 @@ router.post('/', (request, response)=>{
     .catch(error => response.status(500).send(error));
 });
 
+
+router.get('/', (request, response)=>{
+  database('favorites')
+    .then(
+      data => {
+        if (data.length) {
+          response.status(200).send(data)
+        } else {
+          response.status(200).send({message: "You haven't added any favorites yet!"})
+        }
+      }
+    ).catch(error => response.status(500).send(error));
+});
+
 module.exports = router;
