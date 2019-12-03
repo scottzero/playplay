@@ -43,7 +43,7 @@ router.post('/', (request, response)=>{
 
 
 router.get('/', (request, response)=>{
-  database('favorites')
+  database('favorites').columns(['title', 'artistName', 'genre', 'rating'])
     .then(
       data => {
         if (data.length) {
@@ -57,7 +57,7 @@ router.get('/', (request, response)=>{
 
 router.get('/:id', (request, response)=>{
   var songId = request.params.id;
-  database('favorites').where('id', songId)
+  database('favorites').where('id', songId).columns(['title', 'artistName', 'genre', 'rating'])
     .then(data => {
       if (data.length) {
         response.status(200).send(data)
