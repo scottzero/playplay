@@ -41,4 +41,31 @@ router.post('/', (request, response)=>{
     .catch(error => response.status(500).send(error));
 });
 
+
+router.get('/', (request, response)=>{
+  database('favorites')
+    .then(
+      data => {
+        if (data.length) {
+          response.status(200).send(data)
+        } else {
+          response.status(200).send({message: "You haven't added any favorites yet!"})
+        }
+      }
+    ).catch(error => response.status(500).send(error));
+});
+
+router.get('/:id', (request, response)=>{
+  var songId = request.params.id;
+  database('favorites').where('id', songId)
+    .then(data => {
+      if (data.length) {
+        response.status(200).send(data)
+      } else {
+        response.status(404).send({message: "No favorite song is found with the given id. Please try another ID."})
+      }
+    })
+    .catch(error => response.status(500).send(error));
+});
+
 module.exports = router;
