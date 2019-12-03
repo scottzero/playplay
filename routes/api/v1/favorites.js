@@ -68,4 +68,17 @@ router.get('/:id', (request, response)=>{
     .catch(error => response.status(500).send(error));
 });
 
+router.delete('/:id', (request,response) =>{
+  var songId = request.params.id;
+  database('favorites').where('id', songId)
+    .then(data => {
+      if (data.length) {
+        database('favorites').where('id', songId).del()
+        .then(res => response.send(204))
+      } else {
+        response.send(404, {message: "That song could not be deleted, because it does not exist."})
+      }
+    }).catch(error => response.status(500).send(error));
+});
+
 module.exports = router;
