@@ -29,16 +29,21 @@ async function desiredData(track, artist){
 
 
 router.post('/', (request, response)=>{
-    var useMeData = desiredData(request.body.title, request.body.artistName)
-    .then(res =>
-      database('favorites').insert({
-        title: res.title,
-        artistName: res.artistName,
-        rating: res.rating,
-        genre: res.genre},
-        "id")
-    ).then(res => response.status(201).send(`${request.body.title} by ${request.body.artistName} has been added to your favorites!`))
-    .catch(error => response.status(500).send(error));
+    if (request.body.title && request.body.artistName) {
+      var useMeData = desiredData(request.body.title, request.body.artistName)
+      .then(res =>
+        database('favorites').insert({
+          title: res.title,
+          artistName: res.artistName,
+          rating: res.rating,
+          genre: res.genre},
+          "id")
+      ).then(res => response.status(201).send(`${request.body.title} by ${request.body.artistName} has been added to your favorites!`))
+      .catch(error => response.status(500).send(error));
+    } else {
+      return response.status(400).send('There are some missing attributes in your request parameters.');
+    }
+
 });
 
 
