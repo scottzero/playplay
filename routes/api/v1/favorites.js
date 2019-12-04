@@ -14,10 +14,10 @@ const songPojo = require('../../../models/song');
 
 async function getSong(track, artist){
   const key = await getKey('apikey');
-    let response = await fetch(`https://api.musixmatch.com/ws/1.1/matcher.track.get?q_track=${track}&q_artist=${artist}&apikey=${key}`)
-    let song = await response.json();
-    let data = await song.message.body
-    return data;
+  let response = await fetch(`https://api.musixmatch.com/ws/1.1/matcher.track.get?q_track=${track}&q_artist=${artist}&apikey=${key}`)
+  let song = await response.json();
+  let data = await song.message.body
+  return data;
 }
 
 
