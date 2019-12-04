@@ -29,7 +29,7 @@ async function desiredData(track, artist){
 
 router.post('/', (request, response)=>{
     if (request.body.title && request.body.artistName) {
-      database('favorites').where('title', request.body.title).where('artistName', request.body.artistName)
+      database('favorites').where('title', request.body.title.toUpperCase()).where('artistName', request.body.artistName.toUpperCase())
         .then(res => {
           if (res.length) {
             return response.status(400).send({message: 'This song is already in your favorites list!'})
@@ -37,8 +37,8 @@ router.post('/', (request, response)=>{
             var useMeData = desiredData(request.body.title, request.body.artistName)
             .then(res =>
               database('favorites').insert({
-                title: res.title,
-                artistName: res.artistName,
+                title: res.title.toUpperCase(),
+                artistName: res.artistName.toUpperCase(),
                 rating: res.rating,
                 genre: res.genre},
                 "id")
