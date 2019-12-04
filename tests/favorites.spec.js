@@ -127,4 +127,25 @@ describe('Test GET /api/v1/favorites path', () => {
         expect(res.statusCode).toBe(201);
         expect(res.body.message).toEqual('Creep by Radiohead has been added to your favorites!');
       });
+
+      it('respond with 400 when given a song that already exists in the db', async () => {
+        // await database.raw('truncate table favorites cascade');
+        let song = {
+          id: 1,
+          title: 'creep',
+          artistName: 'radiohead',
+          genre: 'alternative',
+          rating: 90,
+        };
+        await database('favorites').insert(song, 'id');
+
+        const res = await request(app).post("/api/v1/favorites")
+          .send({
+            "title": "Creep",
+            "artistName": "Radiohead"
+          })
+
+        expect(res.statusCode).toBe(400);
+        expect(res.body.message).toEqual('This song is already in your favorites list!');
+      });
     });
