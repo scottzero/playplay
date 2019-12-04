@@ -1,5 +1,4 @@
-const yaml = require("js-yaml")
-const fs = require("fs")
+const env = require('dotenv').config();
 const fetch = require('node-fetch');
 const express = require('express');
 const app = express();
@@ -8,7 +7,7 @@ const environment = process.env.NODE_ENV || 'development';
 const configuration = require('../../../knexfile')[environment];
 const database = require('knex')(configuration);
 const getKey = (apikey) => {
-  return yaml.safeLoad(fs.readFileSync("./config.yml", "utf8"))[apikey];
+  return process.env.apikey;
 }
 const songPojo = require('../../../models/song');
 
