@@ -98,4 +98,27 @@ describe('Test GET /api/v1/favorites path', () => {
           expect(res.statusCode).toBe(204);
           expect(res.body).toEqual({});
         });
+    });
+
+    describe('Test POST /api/v1/favorites path', () => {
+      it('respond with 400 not created', async () => {
+        await database.raw('truncate table favorites cascade');
+        const res = await request(app).post("/api/v1/favorites")
+          .send({"artistName": "Test"})
+
+        expect(res.statusCode).toBe(400);
+        expect(res.body.message).toEqual('There are some missing attributes in your request parameters.')
       });
+
+      it('respond with 201 when created', async () => {
+        await database.raw('truncate table favorites cascade');
+        const res = await request(app).post("/api/v1/favorites")
+          .send({
+            "title": "Creep",
+            "artistName": "Radiohead"
+          })
+
+        expect(res.statusCode).toBe(201);
+        expect(res.body.message).toEqual('Creep by Radiohead has been added to your favorites!');
+        });
+    });
