@@ -38,10 +38,10 @@ router.post('/', (request, response)=>{
           rating: res.rating,
           genre: res.genre},
           "id")
-      ).then(res => response.status(201).send(`${request.body.title} by ${request.body.artistName} has been added to your favorites!`))
+      ).then(res => response.status(201).send({ message: `${request.body.title} by ${request.body.artistName} has been added to your favorites!`}))
       .catch(error => response.status(500).send(error));
     } else {
-      return response.status(400).send('There are some missing attributes in your request parameters.');
+      return response.status(400).send({message: 'There are some missing attributes in your request parameters.'});
     }
 
 });
