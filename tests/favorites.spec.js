@@ -74,6 +74,12 @@ describe('Test GET /api/v1/favorites path', () => {
         };
         expect(res.body[0]).toEqual(expected);
       });
+
+      it('sad path, cannot find a song with the given ID...', async () => {
+        const res = await request(app).get("/api/v1/favorites/3");
+        expect(res.statusCode).toBe(404);
+        expect(res.body.message).toEqual("No favorite song is found with the given id. Please try another ID.");
+      });
     });
 
     describe('Test DELETE /api/v1/favorites/:id path', () => {
@@ -120,5 +126,26 @@ describe('Test GET /api/v1/favorites path', () => {
 
         expect(res.statusCode).toBe(201);
         expect(res.body.message).toEqual('Creep by Radiohead has been added to your favorites!');
-        });
+      });
+
+      it('respond with 400 when given a song that already exists in the db', async () => {
+        // await database.raw('truncate table favorites cascade');
+        let song = {
+          id: 1,
+          title: 'creep',
+          artistName: 'radiohead',
+          genre: 'alternative',
+          rating: 90,
+        };
+        await database('favorites').insert(song, 'id');
+
+        const res = await request(app).post("/api/v1/favorites")
+          .send({
+            "title": "Creep",
+            "artistName": "Radiohead"
+          })
+
+        expect(res.statusCode).toBe(400);
+        expect(res.body.message).toEqual('This song is already in your favorites list!');
+      });
     });

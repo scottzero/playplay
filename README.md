@@ -1,74 +1,111 @@
-# All your Express base are belong to us
+# Node Express Favorite Music API project
+<!-- Brief explanation -->
+In this paired project, we build a JSON API that exposes four endpoints (as shown below). We consumed [Musixmatch API](https://developer.musixmatch.com/) to fetch raw data ...
 
-[![Build Status](https://travis-ci.com/turingschool-examples/all-your-base.svg?branch=master)](https://travis-ci.com/turingschool-examples/all-your-base)
+
+### Schema Design
+![favorites-table](https://user-images.githubusercontent.com/24424825/70000810-eeeb0700-1518-11ea-9ed6-2acf5369865a.png)
+- As shown above, there is a Favorite table that has four attributes (i.e., title, artist name, genre, and rating).
+
 
 ## Getting started
-To use this repo, you’ll need to `fork` the repo as your own. Once you have done that, you’ll need to run the following command below to get everything up and running. 
+- Demo: [Sweater-Weather API](https://playoplay.herokuapp.com/)
+- Alternatively, [Postman](https://www.getpostman.com/downloads/) can be used to make HTTP requests.
 
-#### Installing necessary dependencies
-The easiest way to get started is to run the following command. This will pull down any necessary dependencies that your app will require. You can think of this command as something incredibly similar to `bundle install` in Rails. 
+#### 1. Adding a favorite song
+- On Postman, specify the following request type `POST`, and add the following url to the address bar `https://playoplay.herokuapp.com/api/v1/favorites`. Then, click `Send`. It should look like this:
+![postman](https://user-images.githubusercontent.com/24424825/70001084-a718af80-1519-11ea-9cf2-32784eb5356f.png)
 
-`npm install`
+- A successful request would generate a response that looks something like this:
 
-#### Set up your local database
-You’ll need to figure out a name for your database. We suggest calling it something like `sweater_weather_dev`.  
+  ```
+  status: 201
+  ```
 
-To get things set up, you’ll need to access your Postgres instance by typing in `psql` into your terminal. Once there, you can create your database by running the comment `CREATE DATABASE PUT_DATABASE_NAME_HERE_dev;`. 
-
-Now you have a database for your new project.
-
-#### Migrations
-Once you have your database setup, you’ll need to run some migrations (if you have any). You can do this by running the following command: 
-
-`knex migrate:latest`
+- If there is a missing attribute in your request, then a 400 status code will be returned.
 
 
-Instructions to create database, run migrations, and seed: 
+#### 2. Getting a list of all your favorites
+- Specify the request type as `GET` and add the following endpoint to the address bar: `https://playoplay.herokuapp.com/api/v1/favorites`.
+
+- A successful request would generate a response that looks something like this:
+
+  ```
+  status: 200
+  body:
+  [
+    {
+      "id": 1,
+      "title": "We Will Rock You",
+      "artistName": "Queen",
+      "genre": "Rock",
+      "rating": 88
+    },
+    {
+      "id": 2,
+      "title": "Careless Whisper",
+      "artistName": "George Michael",
+      "genre": "Pop",
+      "rating": 93
+    },
+  ]
+  ```
+
+- For a bad request, a 404 status code (Not Found) will be returned.
+
+
+#### 3. Getting a single favorite song
+- To get one of your favorites, select `GET` from the dropdown and append an id to the following endpoint: `https://playoplay.herokuapp.com/api/v1/favorites/:id`.
+
+- A successful request would return an array containing an object as follows:
+
+  ```
+  status: 200
+  body:
+  [
+    {
+      "id": 1,
+      "title": "We Will Rock You",
+      "artistName": "Queen",
+      "genre": "Rock",
+      "rating": 88
+    }
+  ]
+  ```
+
+- If the record with a given ID isn't found, a 404 status code (Not Found) will be returned.
+
+
+#### 4. Deleting one of your favorites
+- To delete a specific song, select `DELETE` from the dropdown and append an id to the following endpoint: `https://playoplay.herokuapp.com/api/v1/favorites/:id`.
+
+- A successful request would return an array containing an object as follows:
+
+  ```
+  status: 204
+  ```
+
+- If the record with a given ID isn't found, a 404 status code (Not Found) will be returned.
+
+
+### For Developers: How to Run Tests
+- In your terminal, clone down this repository and run the following commands:
+
 ```
-psql
-CREATE DATABASE DATABASE_NAME_dev;
-\q
-
-knex migrate:latest
-knex seed:run
+$ npm install
+$ knex migrate:latest
+$ npm test
 ```
 
-#### Set up your test database
-Most of the setup is going to be same as the one you did before. You’ll notice one small difference with setting the environment flag to `test`.  
+### Product Management
+- Project Board: https://github.com/scottzero/playplay/projects/1
+- DTR: https://gist.github.com/nancylee713/63f05f133cfc46a547a9b42a015ce69e
 
+### Versions
 ```
-psql
-CREATE DATABASE DATABASE_NAME_test;
-\q
-
-knex migrate:latest --env test
+node 10.16.3
 ```
 
-## Running your tests
-Running tests are simple and require you to run the following command below: 
-
-`npm test`
-
-When the tests have completed, you’ll get a read out of how things panned out. The tests will be a bit more noisy than what you’re used to, so be prepared. 
-
-## Setting up your production environment
-This repo comes with a lot of things prepared for you. This includes production ready configuration. To get started, you’ll need to do a few things. 
-
-- Start a brand new app on the Heroku dashboard 
-- Add a Postgres instance to your new Heroku app
-- Find the URL of that same Postgres instance and copy it. It should look like a long url. It may look something like like `postgres://sdflkjsdflksdf:9d3367042c8739f3...`.
-- Update your `knexfile.js` file to use your Heroku database instance. You’ll see a key of `connection` with a value of an empty string. This is where you’ll paste your new Postgres instance URL. 
-
-Once you’ve set all of that up, you’ll need to `add the remote` to your new app. This should work no differently than how you’ve done it with any Rails project. Adding this remote will allow you to run `git push heroku master`. 
-
-Once you’ve done that, you’ll need to `bash` into your Heroku instance and get some things set up. 
-
-- Run the following commands to get started:
-```
-heroku run bash
-npm install
-nom install -g knex
-knex migrate:latest
-```
-
-This will install any dependencies, install Knex, and migrate any changes that you’ve made to the database. 
+### Core Contributors
+- Scott Payton & Nancy Lee
+- Project oversight: Turing instructors
