@@ -14,10 +14,10 @@ const songPojo = require('../../../models/song');
 
 async function getSong(track, artist){
   const key = await getKey('apikey');
-    let response = await fetch(`https://api.musixmatch.com/ws/1.1/matcher.track.get?q_track=${track}&q_artist=${artist}&apikey=${key}`)
-    let song = await response.json();
-    let data = await song.message.body
-    return data;
+  let response = await fetch(`https://api.musixmatch.com/ws/1.1/matcher.track.get?q_track=${track}&q_artist=${artist}&apikey=${key}`)
+  let song = await response.json();
+  let data = await song.message.body
+  return data;
 }
 
 
@@ -29,21 +29,26 @@ async function desiredData(track, artist){
 
 
 router.post('/', (request, response)=>{
-    var useMeData = desiredData(request.body.title, request.body.artistName)
-    .then(res =>
-      database('favorites').insert({
-        title: res.title,
-        artistName: res.artistName,
-        rating: res.rating,
-        genre: res.genre},
-        "id")
-    ).then(res => response.status(201).send(`${request.body.title} by ${request.body.artistName} has been added to your favorites!`))
-    .catch(error => response.status(500).send(error));
+    if (request.body.title && request.body.artistName) {
+      var useMeData = desiredData(request.body.title, request.body.artistName)
+      .then(res =>
+        database('favorites').insert({
+          title: res.title,
+          artistName: res.artistName,
+          rating: res.rating,
+          genre: res.genre},
+          "id")
+      ).then(res => response.status(201).send({ message: `${request.body.title} by ${request.body.artistName} has been added to your favorites!`}))
+      .catch(error => response.status(500).send(error));
+    } else {
+      return response.status(400).send({message: 'There are some missing attributes in your request parameters.'});
+    }
+
 });
 
 
 router.get('/', (request, response)=>{
-  database('favorites')
+  database('favorites').columns(['title', 'artistName', 'genre', 'rating'])
     .then(
       data => {
         if (data.length) {
@@ -57,7 +62,7 @@ router.get('/', (request, response)=>{
 
 router.get('/:id', (request, response)=>{
   var songId = request.params.id;
-  database('favorites').where('id', songId)
+  database('favorites').where('id', songId).columns(['title', 'artistName', 'genre', 'rating'])
     .then(data => {
       if (data.length) {
         response.status(200).send(data)
