@@ -5,18 +5,10 @@ var playlists = require('../routes/api/v1/playlists');
 const environment = process.env.NODE_ENV || 'test';
 const configuration = require('../knexfile')[environment];
 const database = require('knex')(configuration);
+const moment = require('moment');
 
 
 describe('Test POST /api/v1/playlists path', () => {
-  // it('respond with 400 not created', async () => {
-  //   await database.raw('truncate table playlists cascade');
-  //   const res = await request(app).post("/api/v1/playlists")
-  //     .send({"artistName": "Test"})
-  //
-  //   expect(res.statusCode).toBe(400);
-  //   expect(res.body.message).toEqual('There are some missing attributes in your request parameters.')
-  // });
-
   it('respond with 201 when created', async () => {
     await database.raw('truncate table playlists cascade');
     const res = await request(app).post("/api/v1/playlists")
@@ -57,3 +49,31 @@ describe('Test POST /api/v1/playlists path', () => {
     expect(res.body.message).toEqual('Playlist titles should be unique.');
   });
 });
+
+describe('Test GET /api/v1/playlists path', () => {
+    it('respond with 200, get an array of playlists...', async () => {
+      // database.raw('truncate table playlists cascade');
+      //
+      // await database('playlists').insert({
+      //   id: 5,
+      //   'title': 'Cleaning House',
+      //   "created_at": moment().toDate(),
+      //   "updated_at": moment().toDate()
+      // });
+      //
+      // const res = await request(app).get("/api/v1/playlists");
+      //
+      // expect(res.statusCode).toBe(200);
+      // const expected = [
+      //   {
+      //     'id': 5,
+      //     'title': 'Cleaning House',
+      //     "createdAt": "2019-12-05T20:18:31.856Z",
+      //     "updatedAt": "2019-12-05T20:18:31.856Z"
+      //
+      //   }
+      // ];
+      //
+      // expect(res.body).toEqual(expected);
+    });
+  });
