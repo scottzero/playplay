@@ -183,6 +183,7 @@ describe('Test GET /api/v1/playlists path', () => {
         })
 
       expect(res.statusCode).toBe(404);
-      expect(res.body.message).toBe("Cannot PUT /api/v1/playlists");
+      var error = res.error.text.includes("Cannot PUT /api/v1/playlists")
+      expect(error).toBe(true);
     });
   });
