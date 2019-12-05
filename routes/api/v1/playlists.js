@@ -26,6 +26,32 @@ router.post('/', (request, response) => {
   }
 })
 
+router.put('/:id', (request, response) => {
+  if (request.params.id) {
+    database('playlists').where('id', request.params.id)
+      .then(res => {
+        if (res.length) {
+          database('playlists').where('title', request.body.title)
+          .then(song => {
+            if (song.length) {
+              return response.status(400).send({ message: 'Playlist titles should be unique.' })
+            } else {
+              database('playlists').where('id', request.params.id).update({
+                title: request.body.title
+              }).returning('*')
+              .then(data => response.status(201).send(data[0]))
+            }
+          })
+        } else {
+          return response.status(404).send({ message: 'Playlist with the given id is not found.' })
+        }
+      })
+      .catch(error => response.status(500).send(error));
+  } else {
+    return response.status(404).send({ message: 'Playlist ID is missing in the request url.' })
+  }
+})
+
 router.get('/', (request, response) => {
   database('playlists').select()
   .then(res => {
