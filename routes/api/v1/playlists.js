@@ -59,7 +59,7 @@ router.get('/', (request, response) => {
         return new playlistPojo(obj)
       });
 
-      return response.status(200).send(playlists);
+      return response.status(200).json(playlists);
     } else {
       return response.status(404).send({ message: "No playlist found"});
     }
