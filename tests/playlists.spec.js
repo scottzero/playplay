@@ -28,6 +28,17 @@ describe('Test POST /api/v1/playlists path', () => {
     expect(res.body.message).toEqual('A new playlist has been created!');
   });
 
+  it('respond with 400 when title is not given', async () => {
+    await database.raw('truncate table playlists cascade');
+    const res = await request(app).post("/api/v1/playlists")
+      .send({
+        "title": null
+      })
+
+    expect(res.statusCode).toBe(400);
+    expect(res.body.message).toEqual('Please add a title in string format.');
+  });
+
   it('respond with 400 when title is not unique', async () => {
     await database.raw('truncate table playlists cascade');
     let playlist_cleanup = {
