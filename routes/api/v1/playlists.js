@@ -81,4 +81,17 @@ router.get('/:id', (request, response) => {
   .catch(error => response.status(500).send(error));
 })
 
+router.delete('/:id', (request, response)=>{
+  var playlistId = request.params.id;
+  database('playlists').where('id', playlistId)
+    .then(data => {
+      if (data.length){
+        database('playlists').where('id', playlistId).del()
+        .then(res => response.send(204))
+      }else{
+        response.send(404, {message: "That playlist could not be deleted, because it does not exist."})
+        }
+    }).catch(error => response.status(500).send(error));
+  });
+
 module.exports = router;
