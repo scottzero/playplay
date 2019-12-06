@@ -2,9 +2,7 @@ const env = require('dotenv').config();
 const express = require('express');
 const app = express();
 const router= express.Router();
-const environment = process.env.NODE_ENV || 'development';
-const configuration = require('../../../knexfile')[environment];
-const database = require('knex')(configuration);
+const database = require('../../../config')
 const playlistPojo = require('../../../models/playlist');
 
 router.post('/', (request, response) => {
@@ -53,6 +51,22 @@ router.put('/:id', (request, response) => {
 
 router.get('/', (request, response) => {
   database('playlists').select()
+  .then(res => {
+    if (res.length) {
+      var playlists = res.map(obj => {
+        return new playlistPojo(obj)
+      });
+
+      return response.status(200).json(playlists);
+    } else {
+      return response.status(404).send({ message: "No playlist found"});
+    }
+  })
+  .catch(error => response.status(500).send(error));
+})
+
+router.get('/:id', (request, response) => {
+  database('playlists').where('id', request.params.id).select()
   .then(res => {
     if (res.length) {
       var playlists = res.map(obj => {
