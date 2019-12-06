@@ -72,7 +72,7 @@ describe('Test GET /api/v1/playlists path', () => {
     });
   });
 
-  describe('Test PUT /api/v1/playlists/:id path', () => {
+describe('Test PUT /api/v1/playlists/:id path', () => {
     it('respond with 201 when updated', async () => {
       await database.raw('truncate table playlists cascade');
       await database('playlists').insert({
@@ -148,4 +148,24 @@ describe('Test GET /api/v1/playlists path', () => {
       var error = res.error.text.includes("Cannot PUT /api/v1/playlists")
       expect(error).toBe(true);
     });
+  });
+
+describe('Test DELETE /api/v1/playlists/:id path', () => {
+  it('sad path, no playlists in the database...', async () => {
+    await database.raw('truncate table playlists cascade');
+    const res = await request(app).delete("/api/v1/playlists/1");
+    expect(res.statusCode).toBe(404);
+    expect(res.body.message).toBe("That playlist could not be deleted, because it does not exist.");
+  });
+
+  it('happy path, delete a single playlist object...', async () => {
+    let playlist = {
+      id: 1,
+      title: 'brunch'
+    };
+    await database('playlists').insert(playlist, 'id');
+    const res = await request(app).delete("/api/v1/playlists/1");
+    expect(res.statusCode).toBe(204);
+    // expect(res.body).toEqual({});
+  });
   });

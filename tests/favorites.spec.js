@@ -21,6 +21,7 @@ describe('Test GET /api/v1/favorites path', () => {
   beforeEach(async () => {
        await database.raw('truncate table favorites cascade');
        let song = {
+         id: 1,
          title: 'creep',
          artistName: 'radiohead',
          genre: 'alternative',
@@ -37,10 +38,11 @@ describe('Test GET /api/v1/favorites path', () => {
       const res = await request(app).get("/api/v1/favorites");
       expect(res.statusCode).toBe(200);
       const expected = {
-        title: 'creep',
-        artistName: 'radiohead',
-        genre: 'alternative',
-        rating: 90
+        'id': 1,
+        'title': 'creep',
+        'artistName': 'radiohead',
+        'genre': 'alternative',
+        'rating': 90
       };
       expect(res.body[0]).toEqual(expected);
     });
@@ -67,10 +69,11 @@ describe('Test GET /api/v1/favorites path', () => {
         const res = await request(app).get("/api/v1/favorites/1");
         expect(res.statusCode).toBe(200);
         const expected = {
-          title: 'creep',
-          artistName: 'radiohead',
-          genre: 'alternative',
-          rating: 90
+          'id': 1,
+          'title': 'creep',
+          'artistName': 'radiohead',
+          'genre': 'alternative',
+          'rating': 90
         };
         expect(res.body[0]).toEqual(expected);
       });
