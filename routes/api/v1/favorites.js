@@ -1,31 +1,8 @@
-const env = require('dotenv').config();
-const fetch = require('node-fetch');
 const express = require('express');
 const app = express();
 const router= express.Router();
-const environment = process.env.NODE_ENV || 'development';
-const configuration = require('../../../knexfile')[environment];
-const database = require('knex')(configuration);
-const getKey = (apikey) => {
-  return process.env.apikey;
-}
-const songPojo = require('../../../models/song');
-
-async function getSong(track, artist){
-  const key = await getKey('apikey');
-  let response = await fetch(`https://api.musixmatch.com/ws/1.1/matcher.track.get?q_track=${track}&q_artist=${artist}&apikey=${key}`)
-  let song = await response.json();
-  let data = await song.message.body
-  return data;
-}
-
-
-async function desiredData(track, artist){
-  var songData = await getSong(track, artist);
-  var filteredSongData = await new songPojo(songData);
-  return filteredSongData
-}
-
+const database = require('../../../config')
+const desiredData = require('../../../helpers/songs_helper')
 
 router.post('/', (request, response)=>{
     if (request.body.title && request.body.artistName) {
@@ -54,7 +31,7 @@ router.post('/', (request, response)=>{
 
 
 router.get('/', (request, response)=>{
-  database('favorites').columns(['title', 'artistName', 'genre', 'rating'])
+  database('favorites').columns(['id', 'title', 'artistName', 'genre', 'rating'])
     .then(
       data => {
         if (data.length) {
@@ -68,7 +45,7 @@ router.get('/', (request, response)=>{
 
 router.get('/:id', (request, response)=>{
   var songId = request.params.id;
-  database('favorites').where('id', songId).columns(['title', 'artistName', 'genre', 'rating'])
+  database('favorites').where('id', songId).columns(['id', 'title', 'artistName', 'genre', 'rating'])
     .then(data => {
       if (data.length) {
         response.status(200).send(data)
