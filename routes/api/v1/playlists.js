@@ -107,4 +107,25 @@ router.delete('/:id', (request, response)=>{
     }).catch(error => response.status(500).send(error));
   });
 
+router.post('/:id/favorites/:fave_id', async (request, response) => {
+  const playlistID = request.params.id;
+  const favoriteID = request.params.fave_id;
+
+  const playlist_title = await database('playlists').where('id', playlistID)
+    .then(playlistData => {
+      return playlistData[0].title
+    });
+
+  const favorite_title = await database('favorites').where('id', favoriteID)
+    .then(songData => {
+      return songData[0].title
+    });
+
+
+  if (playlistID && favoriteID) {
+    database('favorites_playlists').insert({favorite_id: favoriteID, playlist_id: playlistID}, "id")
+      .then(res => { response.status(201).send(`${favorite_title} has been added to ${playlist_title}!`)})
+      .catch(error => response.status(500).send(error));
+    }
+  })
 module.exports = router;
