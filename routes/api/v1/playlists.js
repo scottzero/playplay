@@ -124,4 +124,30 @@ router.post('/:id/favorites/:fave_id', async (request, response) => {
   }
 })
 
+router.delete('/:id/favorites/:fave_id', async (request, response)=>{
+  const playlistID = request.params.id;
+  const favoriteID = request.params.fave_id;
+
+  const temp_playlist = await playlist.findPlaylist(playlistID)
+    .then(playlistData => {
+        return playlistData[0]
+    });
+
+  const temp_favorite = await favorite.findSong(favoriteID)
+    .then(songData => {
+        return songData[0]
+    });
+
+  songPlaylist.find(favoriteID, playlistID)
+    .then(res => {
+      if (res.length) {
+        songPlaylist.find(favoriteID, playlistID).del()
+        .then(res => response.send(204))
+      } else{
+        response.send(404, {message: "That song could not be deleted, because it does not exist."})
+      }
+    })
+    .catch(error => response.status(500).send(error));
+});
+
 module.exports = router;
