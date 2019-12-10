@@ -231,3 +231,44 @@ describe('Test POST /api/v1/playlists/:id/favorites/:fave_id path', () => {
     expect(res.body.message).toEqual("Either favorite song or playlist does not exist");
   });
 });
+
+describe('Test DELETE /api/v1/playlists/:id/favorites/:fave_id path', () => {
+  it('respond with 204 when deleted', async () => {
+    await database.raw('truncate table favorites cascade');
+    await database.raw('truncate table playlists cascade');
+
+    let favorite_song = {
+      id: 1,
+      title: 'creep',
+      artistName: 'radiohead',
+      genre: 'Alternative',
+      rating: 95
+    };
+    await database('favorites').insert(favorite_song, 'id');
+
+    let playlist = {
+      id: 1,
+      title: 'playlist 1'
+    };
+    await database('playlists').insert(playlist, 'id');
+    await database('favorites_playlists').insert({favorite_id: favorite_song.id, playlist_id: playlist.id}, "id");
+
+    const res = await request(app).delete("/api/v1/playlists/1/favorites/1");
+    expect(res.statusCode).toBe(204);
+
+    const playlist_remains = await database('playlists').where("id", 1).select('title')
+    expect(playlist_remains[0].title).toEqual('playlist 1');
+
+    const favorite_remains = await database('favorites').where("id", 1).select('title')
+    expect(favorite_remains[0].title).toEqual('creep');
+  });
+
+  it('sad path, either favorite or playlist does not exist in the database...', async () => {
+    await database.raw('truncate table favorites cascade');
+    await database.raw('truncate table playlists cascade');
+
+    const res = await request(app).delete("/api/v1/playlists/1/favorites/1");
+    expect(res.statusCode).toBe(404);
+    expect(res.body.message).toBe("That song could not be deleted, because it does not exist.");
+  });
+});
