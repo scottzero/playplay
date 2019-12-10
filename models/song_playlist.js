@@ -3,16 +3,6 @@ const database = require('../config')
 const playlist = require('../models/playlist')
 
 class songPlaylist{
-  // constructor(playlistData){
-  //   this.id = playlistData.id;
-  //   this.title = playlistData.title;
-  //   this.songCount = playlistData.songCount;
-  //   this.songAvgRating = playlistData.songAvgRating;
-  //   this.favorites = playlistData.favorites;
-  //   this.createdAt = playlistData.created_at;
-  //   this.updatedAt = playlistData.updated_at;
-  // }
-
   static add(favoriteID, playlistID) {
     return database('favorites_playlists').insert({favorite_id: favoriteID, playlist_id: playlistID}, "id")
   }
