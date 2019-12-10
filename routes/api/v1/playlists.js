@@ -65,7 +65,7 @@ router.get('/', (request, response) => {
   database('playlists').select()
   .then(res => {
     if (res.length) {
-      var playlists = res.map(obj => { new playlist(obj) });
+      var playlists = res.map(obj => new playlist(obj) );
       return response.status(200).json(playlists);
     } else {
       return response.status(404).send({ message: "No playlist found"});
@@ -78,7 +78,7 @@ router.get('/:id', (request, response) => {
   playlist.findPlaylist(request.params.id).select()
   .then(res => {
     if (res.length) {
-      var playlists = res.map(obj => { new playlist(obj) });
+      var playlists = res.map(obj => new playlist(obj) );
       return response.status(200).json(playlists);
     } else {
       return response.status(404).send({ message: "No playlist found"});
@@ -148,6 +148,21 @@ router.delete('/:id/favorites/:fave_id', async (request, response)=>{
       }
     })
     .catch(error => response.status(500).send(error));
+});
+
+router.get('/:id/favorites', async (request, response) => {
+  const playlistID = request.params.id;
+
+  playlist.findPlaylist(playlistID)
+    .then(data => {
+      if (data.length) {
+        songPlaylist.summary(playlistID)
+            .then(res => response.status(200).json(res))
+            .catch(error => response.status(500).send(error));
+      } else {
+        return response.status(404).send({ message: "No playlist found"});
+      }
+    })
 });
 
 module.exports = router;
