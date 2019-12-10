@@ -272,3 +272,25 @@ describe('Test DELETE /api/v1/playlists/:id/favorites/:fave_id path', () => {
     expect(res.body.message).toBe("That song could not be deleted, because it does not exist.");
   });
 });
+
+describe('Test GET /api/v1/playlists/:id/favorites path', () => {
+    it('respond with 200, get an array of detailed song info inside a given playlist...', async () => {
+      database.raw('truncate table playlists cascade');
+
+      await database('playlists').insert({
+        id: 1,
+        'title': 'Playlist 1'
+      }, 'id');
+
+      const res = await request(app).get("/api/v1/playlists/1/favorites");
+
+      expect(res.statusCode).toBe(200);
+      expect(Object.keys(res.body)).toContain('id');
+      expect(Object.keys(res.body)).toContain('title');
+      expect(Object.keys(res.body)).toContain('songCount');
+      expect(Object.keys(res.body)).toContain('songAvgRating');
+      expect(Object.keys(res.body)).toContain('favorites');
+      expect(Object.keys(res.body)).toContain('createdAt');
+      expect(Object.keys(res.body)).toContain('updatedAt');
+    });
+  });
