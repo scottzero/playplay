@@ -168,4 +168,129 @@ describe('Test DELETE /api/v1/playlists/:id path', () => {
     expect(res.statusCode).toBe(204);
     // expect(res.body).toEqual({});
   });
+});
+
+describe('Test POST /api/v1/playlists/:id/favorites/:fave_id path', () => {
+  it('respond with 201 when created', async () => {
+    await database.raw('truncate table favorites cascade');
+    await database.raw('truncate table playlists cascade');
+    // await database.raw('truncate table favorites_playlists cascade');
+
+    let favorite_song = {
+      id: 1,
+      title: 'creep',
+      artistName: 'radiohead',
+      genre: 'Alternative',
+      rating: 95
+    };
+    await database('favorites').insert(favorite_song, 'id');
+
+    let playlist = {
+      id: 1,
+      title: 'playlist 1'
+    };
+    await database('playlists').insert(playlist, 'id');
+
+    const res = await request(app).post("/api/v1/playlists/1/favorites/1");
+    expect(res.statusCode).toBe(201);
+    expect(res.body).toEqual({Success: 'creep has been added to playlist 1!'});
+  });
+
+  it('respond with 400 when favorite song id does not exist', async () => {
+    await database.raw('truncate table favorites cascade');
+    await database.raw('truncate table playlists cascade');
+
+    let playlist = {
+      id: 1,
+      title: 'playlist 1'
+    };
+    await database('playlists').insert(playlist, 'id');
+
+    const res = await request(app).post("/api/v1/playlists/1/favorites/1");
+
+    expect(res.statusCode).toBe(400);
+    expect(res.body.message).toEqual("Either favorite song or playlist does not exist");
+  });
+
+  it('respond with 400 when playlist id does not exist', async () => {
+    // await database.raw('truncate table favorites cascade');
+    await database.raw('truncate table playlists cascade');
+
+    let favorite_song = {
+      id: 1,
+      title: 'creep',
+      artistName: 'radiohead',
+      genre: 'Alternative',
+      rating: 95
+    };
+    await database('favorites').insert(favorite_song, 'id');
+
+    const res = await request(app).post("/api/v1/playlists/1/favorites/1");
+
+    expect(res.statusCode).toBe(400);
+    expect(res.body.message).toEqual("Either favorite song or playlist does not exist");
+  });
+});
+
+describe('Test DELETE /api/v1/playlists/:id/favorites/:fave_id path', () => {
+  it('respond with 204 when deleted', async () => {
+    await database.raw('truncate table favorites cascade');
+    await database.raw('truncate table playlists cascade');
+
+    let favorite_song = {
+      id: 1,
+      title: 'creep',
+      artistName: 'radiohead',
+      genre: 'Alternative',
+      rating: 95
+    };
+    await database('favorites').insert(favorite_song, 'id');
+
+    let playlist = {
+      id: 1,
+      title: 'playlist 1'
+    };
+    await database('playlists').insert(playlist, 'id');
+    await database('favorites_playlists').insert({favorite_id: favorite_song.id, playlist_id: playlist.id}, "id");
+
+    const res = await request(app).delete("/api/v1/playlists/1/favorites/1");
+    expect(res.statusCode).toBe(204);
+
+    const playlist_remains = await database('playlists').where("id", 1).select('title')
+    expect(playlist_remains[0].title).toEqual('playlist 1');
+
+    const favorite_remains = await database('favorites').where("id", 1).select('title')
+    expect(favorite_remains[0].title).toEqual('creep');
+  });
+
+  it('sad path, either favorite or playlist does not exist in the database...', async () => {
+    await database.raw('truncate table favorites cascade');
+    await database.raw('truncate table playlists cascade');
+
+    const res = await request(app).delete("/api/v1/playlists/1/favorites/1");
+    expect(res.statusCode).toBe(404);
+    expect(res.body.message).toBe("That song could not be deleted, because it does not exist.");
+  });
+});
+
+describe('Test GET /api/v1/playlists/:id/favorites path', () => {
+    it('respond with 200, get an array of detailed song info inside a given playlist...', async () => {
+      database.raw('truncate table playlists cascade');
+
+      await database('playlists').insert({
+        id: 1,
+        'title': 'Playlist 1'
+      }, 'id');
+
+      const res = await request(app).get("/api/v1/playlists/1/favorites");
+
+      expect(res.statusCode).toBe(200);
+      expect(Object.keys(res.body)).toContain('id');
+      expect(Object.keys(res.body)).toContain('title');
+      expect(Object.keys(res.body)).toContain('songCount');
+      expect(Object.keys(res.body)).toContain('songAvgRating');
+      expect(Object.keys(res.body)).toContain('favorites');
+      expect(Object.keys(res.body)).toContain('createdAt');
+      expect(Object.keys(res.body)).toContain('updatedAt');
+    });
   });
