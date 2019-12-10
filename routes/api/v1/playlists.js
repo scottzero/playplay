@@ -116,8 +116,15 @@ router.post('/:id/favorites/:fave_id', async (request, response) => {
     });
 
   if (temp_playlist && temp_favorite) {
-    songPlaylist.add(favoriteID, playlistID)
-      .then(res => { response.status(201).send({Success: `${temp_favorite.title} has been added to ${temp_playlist.title}!`})})
+    songPlaylist.find(favoriteID, playlistID)
+      .then(res => {
+        if (res.length) {
+          return response.send(400, {message: "You've already added this song to this playlist!"})
+        } else {
+            songPlaylist.add(favoriteID, playlistID)
+            .then(res => response.status(201).send({Success: `${temp_favorite.title} has been added to ${temp_playlist.title}!`}))
+        }
+      })
       .catch(error => response.status(500).send(error));
   } else {
     return response.send(400, {message: "Either favorite song or playlist does not exist"})
