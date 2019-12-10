@@ -285,13 +285,12 @@ describe('Test GET /api/v1/playlists/:id/favorites path', () => {
       const res = await request(app).get("/api/v1/playlists/1/favorites");
 
       expect(res.statusCode).toBe(200);
-
-      expect(Object.keys(res.body[0])).toContain('id');
-      expect(Object.keys(res.body[0])).toContain('title');
-      expect(Object.keys(res.body[0])).toContain('songCount');
-      expect(Object.keys(res.body[0])).toContain('songAvgRating');
-      expect(Object.keys(res.body[0])).toContain('favorites');
-      expect(Object.keys(res.body[0])).toContain('createdAt');
-      expect(Object.keys(res.body[0])).toContain('updatedAt');
+      expect(Object.keys(res.body)).toContain('id');
+      expect(Object.keys(res.body)).toContain('title');
+      expect(Object.keys(res.body)).toContain('songCount');
+      expect(Object.keys(res.body)).toContain('songAvgRating');
+      expect(Object.keys(res.body)).toContain('favorites');
+      expect(Object.keys(res.body)).toContain('createdAt');
+      expect(Object.keys(res.body)).toContain('updatedAt');
     });
   });

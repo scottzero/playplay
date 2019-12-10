@@ -40,7 +40,7 @@ class songPlaylist{
       "id": playlistID,
       "title": await playlist.findPlaylist(playlistID).select('title').then(res => res[0].title),
       "songCount": await songPlaylist.getPlaylistData(playlistID).then(res => res.length),
-      "songAvgRating": await songPlaylist.getPlaylistData(playlistID).avg('rating').then(res => res[0].avg),
+      "songAvgRating": await songPlaylist.getPlaylistData(playlistID).avg('rating').then(res => Number(res[0].avg)),
       "favorites": await songPlaylist.getFavorites(playlistID),
       "createdAt": await playlist.findPlaylist(playlistID).select('created_at').then(res => res[0].created_at),
       "updatedAt": await playlist.findPlaylist(playlistID).select('updated_at').then(res => res[0].updated_at)
