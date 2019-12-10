@@ -3,35 +3,28 @@ const app = express();
 const router= express.Router();
 const database = require('../../../config')
 const desiredData = require('../../../helpers/songs_helper')
+const favorite = require('../../../models/song');
 
-router.post('/', (request, response)=>{
+router.post('/', async (request, response)=>{
     if (request.body.title && request.body.artistName) {
-      database('favorites').where('title', request.body.title.toUpperCase()).where('artistName', request.body.artistName.toUpperCase())
+      await favorite.findSongByAttributes(request.body.title, request.body.artistName)
         .then(res => {
           if (res.length) {
             return response.status(400).send({message: 'This song is already in your favorites list!'})
           } else {
             var useMeData = desiredData(request.body.title, request.body.artistName)
-            .then(res =>
-              database('favorites').insert({
-                title: res.title.toUpperCase(),
-                artistName: res.artistName.toUpperCase(),
-                rating: res.rating,
-                genre: res.genre},
-                "id")
-            ).then(res => response.status(201).send({ message: `${request.body.title} by ${request.body.artistName} has been added to your favorites!`}))
+            .then(res => favorite.addSong(res))
+            .then(res => response.status(201).send({ message: `${request.body.title} by ${request.body.artistName} has been added to your favorites!`}))
             .catch(error => response.status(500).send(error));
           }
       });
     } else {
       return response.status(400).send({message: 'There are some missing attributes in your request parameters.'});
     }
-
 });
 
-
 router.get('/', (request, response)=>{
-  database('favorites').columns(['id', 'title', 'artistName', 'genre', 'rating'])
+  favorite.getSongs()
     .then(
       data => {
         if (data.length) {
@@ -45,7 +38,8 @@ router.get('/', (request, response)=>{
 
 router.get('/:id', (request, response)=>{
   var songId = request.params.id;
-  database('favorites').where('id', songId).columns(['id', 'title', 'artistName', 'genre', 'rating'])
+
+  favorite.findSong(songId)
     .then(data => {
       if (data.length) {
         response.status(200).send(data)
@@ -58,10 +52,10 @@ router.get('/:id', (request, response)=>{
 
 router.delete('/:id', (request,response) =>{
   var songId = request.params.id;
-  database('favorites').where('id', songId)
+  favorite.findSong(songId)
     .then(data => {
       if (data.length) {
-        database('favorites').where('id', songId).del()
+        favorite.findSong(songId).del()
         .then(res => response.send(204))
       } else {
         response.send(404, {message: "That song could not be deleted, because it does not exist."})
