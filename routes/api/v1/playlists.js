@@ -62,17 +62,23 @@ router.put('/:id', (request, response) => {
 })
 
 router.get('/', (request, response) => {
-  database('playlists').select()
-  .then(res => {
-    if (res.length) {
-      var playlists = res.map(obj => new playlist(obj) );
-      return response.status(200).json(playlists);
-    } else {
-      return response.status(404).send({ message: "No playlist found"});
-    }
+  playlist.all()
+    .then(async arr => {
+      if (arr.length) {
+        const promises = arr.map(async obj => {
+          const fave_playlist = await songPlaylist.summary(obj)
+          return fave_playlist;
+        })
+
+        var temp = await Promise.all(promises)
+        return temp;
+      } else {
+        return response.status(404).send({ message: "No playlist found"});
+      }
+    })
+    .then(res => response.status(200).json(res))
+    .catch(error => response.status(500).send(error));
   })
-  .catch(error => response.status(500).send(error));
-})
 
 router.get('/:id', (request, response) => {
   playlist.findPlaylist(request.params.id).select()
