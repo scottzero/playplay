@@ -52,14 +52,26 @@ describe('Test POST /api/v1/playlists path', () => {
 
 describe('Test GET /api/v1/playlists path', () => {
     it('respond with 200, get an array of playlists...', async () => {
-      database.raw('truncate table playlists cascade');
+      await database.raw('truncate table playlists cascade');
 
       await database('playlists').insert({
-        id: 5,
+        id: 1,
         'title': 'Cleaning House'
-        // "created_at": moment().toDate(),
-        // "updated_at": moment().toDate()
       });
+
+      await database.raw('truncate table favorites cascade');
+
+      let favorite_song = {
+        id: 1,
+        title: 'creep',
+        artistName: 'radiohead',
+        genre: 'Alternative',
+        rating: 95
+      };
+      await database('favorites').insert(favorite_song, 'id');
+
+      await database.raw('truncate table favorites_playlists cascade');
+      await database('favorites_playlists').insert({favorite_id: 1, playlist_id: 1}, 'id');
 
       const res = await request(app).get("/api/v1/playlists");
 
@@ -67,6 +79,9 @@ describe('Test GET /api/v1/playlists path', () => {
 
       expect(Object.keys(res.body[0])).toContain('id');
       expect(Object.keys(res.body[0])).toContain('title');
+      expect(Object.keys(res.body[0])).toContain('songCount');
+      expect(Object.keys(res.body[0])).toContain('songAvgRating');
+      expect(Object.keys(res.body[0])).toContain('favorites');
       expect(Object.keys(res.body[0])).toContain('createdAt');
       expect(Object.keys(res.body[0])).toContain('updatedAt');
     });
