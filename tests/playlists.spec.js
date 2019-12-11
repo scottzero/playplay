@@ -85,6 +85,17 @@ describe('Test GET /api/v1/playlists path', () => {
       expect(Object.keys(res.body[0])).toContain('createdAt');
       expect(Object.keys(res.body[0])).toContain('updatedAt');
     });
+
+    it('respond with 404, get an array of playlists...', async () => {
+      await database.raw('truncate table playlists cascade');
+      await database.raw('truncate table favorites_playlists cascade');
+
+      const res = await request(app).get("/api/v1/playlists");
+
+      expect(res.statusCode).toBe(404);
+
+      expect(res.body.message).toEqual("No playlist found");
+    });
   });
 
 describe('Test PUT /api/v1/playlists/:id path', () => {
