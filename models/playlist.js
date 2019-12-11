@@ -9,6 +9,10 @@ class Playlist{
     this.updatedAt = playlistData.updated_at;
   }
 
+  static all() {
+    return database('playlists').select('id').map(obj => obj.id)
+  }
+
   static findPlaylist(id) {
     return database('playlists').where('id', id)
   }
