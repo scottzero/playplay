@@ -179,7 +179,7 @@ In this paired project, we build a JSON RESTful API that exposes 11 endpoints fo
       "createdAt": 2019-11-26T16:03:43+00:00,
       "updatedAt": 2019-11-26T16:03:43+00:00
     }
-]
+  ]
   ```
 
 - For a bad request, or when the playlist table has no records yet, a 404 status code (Not Found) will be returned.
