@@ -326,6 +326,12 @@ In this paired project, we build a JSON RESTful API that exposes 11 endpoints fo
   $ npm test
   ```
 
+- To access test coverage report:
+
+  ```
+  $ open coverage/lcov-report/index.html
+  ```
+
 ### Product Management
 - Project Board: https://github.com/scottzero/playplay/projects/1
 - DTR: https://gist.github.com/nancylee713/63f05f133cfc46a547a9b42a015ce69e
