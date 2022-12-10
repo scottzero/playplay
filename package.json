@@ -10,7 +10,7 @@
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
     "dotenv": "^8.2.0",
-    "express": "~4.16.1",
+    "express": "~4.17.3",
     "js-yaml": "^3.13.1",
     "knex": "^0.19.5",
     "moment": "^2.24.0",
